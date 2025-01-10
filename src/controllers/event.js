@@ -1,56 +1,112 @@
-import QRCode from 'qrcode';
-import prisma from '../config/prismaClient';
+import prisma from '../config/prismaClient.js';
 
-const registerForEvent = async (req, res, next) => {
+export const createEvent = async (req, res, next) => {
   try {
-    const { userId, eventId } = req.body;
+    const eventDetails = req.body;
 
-    // Validate inputs
-    if (!userId || !eventId) {
-      return res
-        .status(400)
-        .json({ message: 'User ID and Event ID are required.' });
-    }
-
-    // Check if the user is already registered for the event
-    const existingRegistration = await prisma.registration.findUnique({
-      where: { userId_eventId: { userId, eventId } },
+    // Create the new event
+    const event = await prisma.event.create({
+      data: eventDetails,
     });
 
-    if (existingRegistration) {
-      return res
-        .status(400)
-        .json({ message: 'User is already registered for this event.' });
-    }
-
-    // Create a new registration and connect the user and event using 'connect'
-    const registration = await prisma.registration.create({
-      data: {
-        user: { connect: { id: userId } }, // Connect the existing user by their ID
-        event: { connect: { id: eventId } }, // Connect the existing event by its ID
-      },
-    });
-
-    // Generate a unique QR code for the registration
-    const qrData = {
-      eventId,
-      userId,
-      registrationId: registration.id, // This is the unique identifier for the registration
-    };
-
-    const qrCodeString = JSON.stringify(qrData); // Encode the registration data in JSON
-    const qrCodeUrl = await QRCode.toDataURL(qrCodeString); // Generate QR code as base64 image
-
-    // Respond with the QR code
-    res.status(200).json({
-      message: 'Registration successful. QR code generated.',
-      qrCodeUrl, // Send back the QR code image in base64
-    });
+    res
+      .status(201)
+      .json({ message: 'Event created successfully', data: event });
   } catch (error) {
-    next(error);
+    next(error); // Pass error to error handler
   }
 };
 
-module.exports = {
-  registerForEvent,
+export const updateEvent = async (req, res, next) => {
+  try {
+    const { eventId } = req.params; // Get event ID from route params
+    const eventUpdateData = req.body;
+
+    // Find the event by ID
+    const existingEvent = await prisma.event.findUnique({
+      where: { id: parseInt(eventId) },
+    });
+
+    if (!existingEvent) {
+      return res.status(404).json({ message: 'Event not found.' });
+    }
+
+    // Update the event
+    const updatedEvent = await prisma.event.update({
+      where: { id: parseInt(eventId) },
+      data: eventUpdateData,
+    });
+
+    res
+      .status(200)
+      .json({ message: 'Event updated successfully', data: updatedEvent });
+  } catch (error) {
+    next(error); // Pass error to error handler
+  }
+};
+
+export const deleteEvent = async (req, res, next) => {
+  try {
+    const { eventId } = req.params; // Get event ID from route params
+
+    // Find the event by ID
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(eventId) },
+    });
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found.' });
+    }
+
+    // Delete the event
+    await prisma.event.delete({
+      where: { id: parseInt(eventId) },
+    });
+
+    res.status(200).json({ message: 'Event deleted successfully.' });
+  } catch (error) {
+    next(error); // Pass error to error handler
+  }
+};
+
+export const getEventById = async (req, res, next) => {
+  try {
+    const { eventId } = req.params; // Get event ID from route params
+
+    // Find the event by ID
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(eventId) },
+      include: {
+        Attendance: true, // You can include related data if needed
+        Registration: true, // Same for the Registration model if necessary
+      },
+    });
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found.' });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Event successfully fetched.', data: event });
+  } catch (error) {
+    next(error); // Pass error to error handler
+  }
+};
+
+export const getAllEvents = async (req, res, next) => {
+  try {
+    // Retrieve all events
+    const events = await prisma.event.findMany();
+
+    if (events.length === 0) {
+      return res.status(404).json({ message: 'No events found.' });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Events successfully fetched.', data: events });
+  } catch (error) {
+    next(error); // Pass error to error handler
+  }
 };

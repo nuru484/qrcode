@@ -70,7 +70,7 @@ model Attendance {
 
 model Registration {
   id               Int      @id @default(autoincrement())
-  registrationCode String   @unique
+  registrationCode String   @unique @default(uuid())
   userId           Int
   eventId          Int
   createdAt        DateTime @default(now())

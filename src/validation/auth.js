@@ -1,4 +1,5 @@
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
+import handleValidationErrors from './validationErrorHandler.js';
 
 const loginValidators = [
   // Username validation
@@ -15,19 +16,5 @@ const loginValidators = [
     .trim()
     .escape(),
 ];
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      status: 'fail',
-      errors: errors.array().map((error) => ({
-        field: error.param,
-        message: error.msg,
-      })),
-    });
-  }
-  next();
-};
 
 export default [...loginValidators, handleValidationErrors];

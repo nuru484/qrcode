@@ -1,6 +1,7 @@
-import { body, validationResult } from 'express-validator';
+import { body } from 'express-validator';
 import prisma from '../config/prismaClient.js';
 import { CustomError } from '../utils/middleware/errorHandler.js';
+import handleValidationErrors from './validationErrorHandler.js';
 
 const userRegistrationValidators = [
   body('firstName')
@@ -86,14 +87,5 @@ const userRegistrationValidators = [
       }
     }),
 ];
-
-// Error handling middleware
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-};
 
 export default [...userRegistrationValidators, handleValidationErrors];
