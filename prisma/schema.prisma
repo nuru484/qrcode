@@ -25,7 +25,7 @@ enum role {
   STUDENT
 }
 
-model StudentId {
+model StudentIdentification {
   id        Int     @id @default(autoincrement())
   studentId String  @unique
   taken     Boolean @default(false)
@@ -34,7 +34,7 @@ model StudentId {
   user User @relation(fields: [userId], references: [id])
 }
 
-model StaffId {
+model AdminIdentification {
   id      Int     @id @default(autoincrement())
   staffId String  @unique
   taken   Boolean @default(false)
@@ -52,10 +52,10 @@ model User {
   email     String @unique
   role      role
 
-  Attendance   Attendance[]
-  Registration Registration[]
-  StudentId    StudentId?
-  StaffId      StaffId?
+  Attendance            Attendance[]
+  Registration          Registration[]
+  StudentIdentification StudentIdentification?
+  AdminIdentification   AdminIdentification?
 }
 
 model Event {
