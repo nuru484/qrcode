@@ -14,10 +14,44 @@ import {
   getAllEvents,
 } from '../controllers/index.js';
 
-router.post('/', validateEventDetails, createEvent);
-router.put('/:eventId', validateEventUpdateDetails, updateEvent);
-router.delete('/:eventId', deleteEvent);
-router.get('/:eventId', getEventById);
-router.get('/', getAllEvents);
+import isAuthenticated from '../utils/middleware/authentication.js';
+import authorizeRole from '../utils/middleware/authorizeRole.js';
+
+router.post(
+  '/',
+  validateEventDetails,
+  isAuthenticated,
+  authorizeRole(['ADMIN']),
+  createEvent
+);
+
+router.put(
+  '/:eventId',
+  validateEventUpdateDetails,
+  isAuthenticated,
+  authorizeRole(['ADMIN']),
+  updateEvent
+);
+
+router.delete(
+  '/:eventId',
+  isAuthenticated,
+  authorizeRole(['ADMIN']),
+  deleteEvent
+);
+
+router.get(
+  '/:eventId',
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  getEventById
+);
+
+router.get(
+  '/',
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  getAllEvents
+);
 
 export default router;

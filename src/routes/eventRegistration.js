@@ -12,11 +12,52 @@ import {
 
 import { validateUserId, validateEventId } from '../validation/idValidators.js';
 
-router.post('/', validateUserId, validateEventId, registerForEvent);
-router.delete('/', validateUserId, validateEventId, deleteEventRegistration);
-router.get('/', getAllRegistrations);
-router.get('/event/:eventId', validateEventId, getRegistrationsByEvent);
-router.get('/user/:userId', validateUserId, getRegistrationsByUser);
-router.get('/status', validateUserId, validateEventId, checkRegistrationStatus);
+import isAuthenticated from '../utils/middleware/authentication.js';
+import authorizeRole from '../utils/middleware/authorizeRole.js';
+
+router.post(
+  '/',
+  validateUserId,
+  validateEventId,
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  registerForEvent
+);
+
+router.delete(
+  '/',
+  validateUserId,
+  validateEventId,
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  deleteEventRegistration
+);
+
+router.get('/', isAuthenticated, authorizeRole(['ADMIN']), getAllRegistrations);
+
+router.get(
+  '/event/:eventId',
+  validateEventId,
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  getRegistrationsByEvent
+);
+
+router.get(
+  '/user/:userId',
+  validateUserId,
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  getRegistrationsByUser
+);
+
+router.get(
+  '/status',
+  validateUserId,
+  validateEventId,
+  isAuthenticated,
+  authorizeRole(['ADMIN', 'STUDENT']),
+  checkRegistrationStatus
+);
 
 export default router;
