@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node --watch server",
     "migrate": "npx prisma migrate dev --name init",
+    "seed": "node identificationSeed.js",
     "build": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "start": "node server.js"

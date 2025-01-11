@@ -86,6 +86,12 @@ const userRegistrationValidators = [
         throw error;
       }
     }),
+
+  body('identification')
+    .exists({ checkFalsy: true })
+    .withMessage('You must provide identification.')
+    .trim()
+    .escape(),
 ];
 
 export default [...userRegistrationValidators, handleValidationErrors];
