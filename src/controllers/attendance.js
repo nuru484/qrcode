@@ -97,6 +97,18 @@ export const getAllAttendance = async (req, res, next) => {
 export const getUserAttendance = async (req, res, next) => {
   try {
     const { userId } = req.params;
+
+    // Find the user by ID
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+    });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: `User with ID ${userId} not found.` });
+    }
+
     const { page = 1, limit = 10 } = req.query; // Pagination parameters
 
     const userAttendances = await prisma.attendance.findMany({
@@ -137,6 +149,18 @@ export const getUserAttendance = async (req, res, next) => {
 export const getEventAttendance = async (req, res, next) => {
   try {
     const { eventId } = req.params;
+
+    // Find the event by ID
+    const event = await prisma.event.findUnique({
+      where: { id: parseInt(eventId) },
+    });
+
+    if (!event) {
+      return res
+        .status(404)
+        .json({ message: `Event with ID ${eventId} not found.` });
+    }
+
     const { page = 1, limit = 10 } = req.query; // Pagination parameters
 
     const eventAttendances = await prisma.attendance.findMany({

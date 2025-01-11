@@ -28,7 +28,9 @@ export const updateEvent = async (req, res, next) => {
     });
 
     if (!existingEvent) {
-      return res.status(404).json({ message: 'Event not found.' });
+      return res
+        .status(404)
+        .json({ message: `Event with ID ${eventId} not found.` });
     }
 
     // Update the event
@@ -39,7 +41,7 @@ export const updateEvent = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: 'Event updated successfully', data: updatedEvent });
+      .json({ message: 'Event updated successfully.', data: updatedEvent });
   } catch (error) {
     next(error); // Pass error to error handler
   }
@@ -55,7 +57,9 @@ export const deleteEvent = async (req, res, next) => {
     });
 
     if (!event) {
-      return res.status(404).json({ message: 'Event not found.' });
+      return res
+        .status(404)
+        .json({ message: `Event with ID ${eventId} not found.` });
     }
 
     // Delete the event
@@ -83,7 +87,9 @@ export const getEventById = async (req, res, next) => {
     });
 
     if (!event) {
-      return res.status(404).json({ message: 'Event not found.' });
+      return res
+        .status(404)
+        .json({ message: `Event with ID ${eventId} not found.` });
     }
 
     res

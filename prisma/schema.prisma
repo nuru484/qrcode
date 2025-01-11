@@ -25,6 +25,24 @@ enum role {
   STUDENT
 }
 
+model StudentId {
+  id        Int     @id @default(autoincrement())
+  studentId String  @unique
+  taken     Boolean @default(false)
+  userId    Int     @unique
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model StaffId {
+  id      Int     @id @default(autoincrement())
+  staffId String  @unique
+  taken   Boolean @default(false)
+  userId  Int     @unique
+
+  user User @relation(fields: [userId], references: [id])
+}
+
 model User {
   id        Int    @id @default(autoincrement())
   firstName String @db.VarChar(255)
@@ -36,6 +54,8 @@ model User {
 
   Attendance   Attendance[]
   Registration Registration[]
+  StudentId    StudentId?
+  StaffId      StaffId?
 }
 
 model Event {

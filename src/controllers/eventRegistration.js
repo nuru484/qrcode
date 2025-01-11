@@ -5,13 +5,6 @@ export const registerForEvent = async (req, res, next) => {
   try {
     const { userId, eventId } = req.body;
 
-    // Validate inputs
-    if (!userId || !eventId) {
-      return res
-        .status(400)
-        .json({ message: 'User ID and Event ID are required.' });
-    }
-
     // Check if the user is already registered for the event
     const existingRegistration = await prisma.registration.findUnique({
       where: { userId_eventId: { userId, eventId } },
@@ -54,13 +47,6 @@ export const registerForEvent = async (req, res, next) => {
 export const deleteEventRegistration = async (req, res, next) => {
   try {
     const { userId, eventId } = req.body;
-
-    // Validate inputs
-    if (!userId || !eventId) {
-      return res
-        .status(400)
-        .json({ message: 'User ID and Event ID are required.' });
-    }
 
     // Check if the user is registered for the event
     const existingRegistration = await prisma.registration.findUnique({
@@ -195,7 +181,7 @@ export const getRegistrationsByUser = async (req, res, next) => {
 
 export const checkRegistrationStatus = async (req, res, next) => {
   try {
-    const { userId, eventId } = req.query;
+    const { userId, eventId } = req.body;
 
     const registration = await prisma.registration.findUnique({
       where: {
