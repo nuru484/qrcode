@@ -54,13 +54,11 @@ model Event {
 model Attendance {
   id                  Int       @id @default(autoincrement())
   markedBy            String?
-  attendanceStartTime DateTime?
+  attendanceStartTime DateTime? @default(now())
   attendanceEndTime   DateTime?
   userId              Int
   eventId             Int
   attended            Boolean   @default(false)
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
 
   user  User  @relation(fields: [userId], references: [id])
   event Event @relation(fields: [eventId], references: [id])

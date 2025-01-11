@@ -84,3 +84,134 @@ export const deleteEventRegistration = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllRegistrations = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+
+    const registrations = await prisma.registration.findMany({
+      skip: (page - 1) * parseInt(limit),
+      take: parseInt(limit),
+      include: {
+        user: true,
+        event: true,
+      },
+    });
+
+    const totalRecords = await prisma.registration.count();
+
+    res.status(200).json({
+      message: 'Registrations fetched successfully.',
+      data: registrations,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRegistrationsByEvent = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const registrations = await prisma.registration.findMany({
+      where: { eventId: parseInt(eventId) },
+      skip: (page - 1) * parseInt(limit),
+      take: parseInt(limit),
+      include: {
+        user: true,
+      },
+    });
+
+    const totalRecords = await prisma.registration.count({
+      where: { eventId: parseInt(eventId) },
+    });
+
+    if (registrations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: 'No registrations found for this event.' });
+    }
+
+    res.status(200).json({
+      message: 'Registrations fetched successfully.',
+      data: registrations,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getRegistrationsByUser = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const registrations = await prisma.registration.findMany({
+      where: { userId: parseInt(userId) },
+      skip: (page - 1) * parseInt(limit),
+      take: parseInt(limit),
+      include: {
+        event: true,
+      },
+    });
+
+    const totalRecords = await prisma.registration.count({
+      where: { userId: parseInt(userId) },
+    });
+
+    if (registrations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: 'No registrations found for this user.' });
+    }
+
+    res.status(200).json({
+      message: 'Registrations fetched successfully.',
+      data: registrations,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkRegistrationStatus = async (req, res, next) => {
+  try {
+    const { userId, eventId } = req.query;
+
+    const registration = await prisma.registration.findUnique({
+      where: {
+        userId_eventId: {
+          userId: parseInt(userId),
+          eventId: parseInt(eventId),
+        },
+      },
+    });
+
+    if (!registration) {
+      return res.status(200).json({ isRegistered: false });
+    }
+
+    res.status(200).json({ isRegistered: true });
+  } catch (error) {
+    next(error);
+  }
+};

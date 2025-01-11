@@ -96,16 +96,30 @@ export const getEventById = async (req, res, next) => {
 
 export const getAllEvents = async (req, res, next) => {
   try {
-    // Retrieve all events
-    const events = await prisma.event.findMany();
+    const { page = 1, limit = 10 } = req.query; // Pagination parameters
+
+    // Retrieve paginated events
+    const events = await prisma.event.findMany({
+      skip: (page - 1) * parseInt(limit), // Skip records for previous pages
+      take: parseInt(limit), // Limit the number of records per page
+    });
+
+    const totalRecords = await prisma.event.count(); // Get total events count
 
     if (events.length === 0) {
       return res.status(404).json({ message: 'No events found.' });
     }
 
-    res
-      .status(200)
-      .json({ message: 'Events successfully fetched.', data: events });
+    res.status(200).json({
+      message: 'Events successfully fetched.',
+      data: events,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(totalRecords / limit),
+        totalRecords,
+      },
+    });
   } catch (error) {
     next(error); // Pass error to error handler
   }
