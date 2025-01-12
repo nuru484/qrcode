@@ -1,4 +1,30 @@
 import passport from 'passport';
+import prisma from '../config/prismaClient.js';
+import { CustomError } from '../utils/middleware/errorHandler.js';
+
+export const user = async (req, res, next) => {
+  try {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      throw new CustomError(401, 'Session expired, please login again.');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId, 10),
+      },
+    });
+
+    if (user) {
+      res.status(200).json({ data: user });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const login = async (req, res, next) => {
   try {

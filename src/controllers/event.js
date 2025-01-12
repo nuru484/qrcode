@@ -81,8 +81,16 @@ export const getEventById = async (req, res, next) => {
     const event = await prisma.event.findUnique({
       where: { id: parseInt(eventId) },
       include: {
-        Attendance: true, // You can include related data if needed
-        Registration: true, // Same for the Registration model if necessary
+        Attendance: {
+          include: {
+            user: true, // Assuming `user` is the related model in Attendance
+          },
+        },
+        Registration: {
+          include: {
+            user: true,
+          },
+        }, // Include the entire Registration model
       },
     });
 

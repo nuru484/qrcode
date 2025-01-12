@@ -48,7 +48,9 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
     }
   },
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
+
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(passport.initialize());

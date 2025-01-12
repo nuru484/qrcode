@@ -1,5 +1,5 @@
 import registerUser from './registration.js';
-import { login, logout } from './auth.js';
+import { user, login, logout } from './auth.js';
 import {
   registerForEvent,
   deleteEventRegistration,
@@ -26,6 +26,7 @@ import {
 
 export {
   registerUser,
+  user,
   login,
   logout,
   registerForEvent,
