@@ -66,8 +66,8 @@ model Attendance {
   eventId             Int
   attended            Boolean   @default(false)
 
-  user  User  @relation(fields: [userId], references: [id])
-  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([userId, eventId])
 }
@@ -80,8 +80,8 @@ model Registration {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user  User  @relation(fields: [userId], references: [id])
-  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([userId, eventId])
 }

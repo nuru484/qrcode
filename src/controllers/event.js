@@ -114,7 +114,19 @@ export const getAllEvents = async (req, res, next) => {
 
     // Retrieve paginated events
     const events = await prisma.event.findMany({
-      skip: (page - 1) * parseInt(limit), // Skip records for previous pages
+      skip: (page - 1) * parseInt(limit),
+      include: {
+        Attendance: {
+          include: {
+            user: true, // Assuming `user` is the related model in Attendance
+          },
+        },
+        Registration: {
+          include: {
+            user: true,
+          },
+        }, // Include the entire Registration model
+      },
       take: parseInt(limit), // Limit the number of records per page
     });
 
