@@ -6,7 +6,7 @@ export const user = async (req, res, next) => {
   try {
     const userId = req.session.userId;
 
-    console.log(req.session.userId);
+    console.log(`User session: ${req.session.userId}`);
 
     if (!userId) {
       throw new CustomError(401, 'Session expired, please login again.');
