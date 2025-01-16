@@ -1,4 +1,4 @@
-import registerUser from './registration.js';
+import registerUser from './signup.js';
 import { user, login, logout } from './auth.js';
 import {
   registerForEvent,

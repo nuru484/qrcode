@@ -34,10 +34,17 @@ export const registerForEvent = async (req, res, next) => {
     const qrCodeString = JSON.stringify(qrData); // Encode the registration data in JSON
     const qrCodeUrl = await QRCode.toDataURL(qrCodeString); // Generate QR code as base64 image
 
+    // Update the registration with the generated QR code URL
+    await prisma.registration.update({
+      where: { id: registration.id },
+      data: { registrationCode: qrCodeUrl },
+    });
+
     // Respond with the QR code
     res.status(200).json({
       message: 'Registration successful. QR code generated.',
-      data: qrCodeUrl, // Send back the QR code image in base64
+      data: qrCodeUrl,
+      eventId,
     });
   } catch (error) {
     next(error);
@@ -65,7 +72,9 @@ export const deleteEventRegistration = async (req, res, next) => {
     });
 
     // Respond with success message
-    res.status(200).json({ message: 'Registration successfully deleted.' });
+    res
+      .status(200)
+      .json({ message: 'Registration successfully deleted.', eventId });
   } catch (error) {
     next(error);
   }

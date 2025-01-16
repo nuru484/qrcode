@@ -45,7 +45,6 @@ router.get(
 
 router.get(
   '/user/:userId',
-  validateUserId,
   isAuthenticated,
   authorizeRole(['ADMIN', 'STUDENT']),
   getRegistrationsByUser

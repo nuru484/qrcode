@@ -26,7 +26,16 @@ export const createAttendance = async (req, res, next) => {
         .json({ message: 'Invalid or unauthorized QR code.' });
     }
 
-    // Mark attendance (optional)
+    const checkAttendance = await prisma.attendance.findUnique({
+      where: { userId_eventId: { userId, eventId } },
+    });
+
+    if (checkAttendance && checkAttendance.attended) {
+      return res
+        .status(409)
+        .json({ message: 'User attendance has already been captured.' });
+    }
+
     const attendance = await prisma.attendance.upsert({
       where: { userId_eventId: { userId, eventId } },
       update: { attended: true },

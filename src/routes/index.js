@@ -1,7 +1,7 @@
 import { Router } from 'express';
 const router = Router();
 
-import registrationRoutes from './userRegistration.js';
+import registrationRoutes from './signup.js';
 import authRoutes from './auth.js';
 import eventRegistrationRoutes from './eventRegistration.js';
 import eventRoutes from './event.js';
