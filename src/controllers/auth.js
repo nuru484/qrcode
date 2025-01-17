@@ -43,7 +43,7 @@ export const login = async (req, res, next) => {
         // Save user ID in the session
         req.session.userId = user.id;
 
-        console.log(req.session.userId);
+        console.log(`Session: ${req.session.userId}`);
         return res.status(200).json({ message: 'Login successful.' });
       });
     })(req, res, next);
