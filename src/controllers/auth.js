@@ -6,6 +6,8 @@ export const user = async (req, res, next) => {
   try {
     const userId = req.session.userId;
 
+    console.log(`Requets session: ${req.session}`);
+
     if (!userId) {
       throw new CustomError(401, 'Session expired, please login again.');
     }
