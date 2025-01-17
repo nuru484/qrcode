@@ -14,48 +14,60 @@ import errorHandler from './src/utils/middleware/errorHandler.js';
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(
   expressSession({
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none', // Required for cross-origin cookies
+      httpOnly: true,
     },
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     proxy: true,
     store: new PrismaSessionStore(new PrismaClient(), {
-      checkPeriod: 2 * 60 * 1000, //ms
+      checkPeriod: 2 * 60 * 1000,
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
   })
 );
 
-app.enable('trust proxy');
-
 const allowedOrigins = new Set(
   process.env.CORS_ACCESS ? process.env.CORS_ACCESS.split(',') : []
 );
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // If the origin is not provided or is allowed, proceed with the request
     if (!origin || allowedOrigins.has(origin)) {
-      callback(null, true);
+      callback(null, origin);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  origin: true,
 };
 
+app.enable('trust proxy');
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 initializePassport(passport);
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader(
+    'Access-Control-Allow-Origin',
+    'https://qrcode-frontend-lovat.vercel.app'
+  );
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
 app.use('/api/v1', routes);
 
