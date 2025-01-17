@@ -19,7 +19,7 @@ app.use(
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none', // Required for cross-origin cookies
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       httpOnly: true,
     },
     secret: process.env.SESSION_SECRET,
@@ -41,12 +41,14 @@ const allowedOrigins = new Set(
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.has(origin)) {
-      callback(null, origin);
+      callback(null, true); // Pass true for allowing credentials
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,
+  credentials: true, // Allow cookies to be sent with requests
+  methods: 'GET, POST, PUT, DELETE', // Allow these HTTP methods
+  allowedHeaders: 'Content-Type, Authorization', // Allow these headers
 };
 
 app.enable('trust proxy');
@@ -57,17 +59,6 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 initializePassport(passport);
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader(
-    'Access-Control-Allow-Origin',
-    'https://qrcode-frontend-lovat.vercel.app'
-  );
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
 
 app.use('/api/v1', routes);
 
