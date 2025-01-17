@@ -14,64 +14,55 @@ import errorHandler from './src/utils/middleware/errorHandler.js';
 
 const app = express();
 
-// Middleware to parse JSON and URL-encoded requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-// Express session setup
 app.use(
   expressSession({
     cookie: {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      httpOnly: true, // Prevent JavaScript access to cookies
-      secure: process.env.NODE_ENV === 'production', // Only set cookies over HTTPS in production
-      sameSite: 'none', // Allow cross-origin cookies
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     },
     secret: process.env.SESSION_SECRET,
-    resave: false, // Prevent unnecessary session saving
-    saveUninitialized: false, // Prevent saving uninitialized sessions
+    resave: false,
+    saveUninitialized: false,
     store: new PrismaSessionStore(new PrismaClient(), {
-      checkPeriod: 2 * 60 * 1000, // ms
+      checkPeriod: 2 * 60 * 1000, //ms
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
   })
 );
 
-// Configure allowed origins for CORS
+app.set('trust proxy', 1);
+
 const allowedOrigins = new Set(
   process.env.CORS_ACCESS ? process.env.CORS_ACCESS.split(',') : []
 );
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow if origin is in the allowed list or is undefined (for same-origin requests)
+    // If the origin is not provided or is allowed, proceed with the request
     if (!origin || allowedOrigins.has(origin)) {
       callback(null, true);
     } else {
+      // Deny requests from disallowed origins
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
-// CORS middleware
 app.use(cors(corsOptions));
-
-// Cookie parsing middleware
 app.use(cookieParser());
-
-// Passport.js initialization
 app.use(passport.initialize());
 app.use(passport.session());
 initializePassport(passport);
 
-// Application routes
 app.use('/api/v1', routes);
 
-// Error handling middleware
 app.use(errorHandler);
 
-// Start the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`App is listening on http://localhost:${port}`);
