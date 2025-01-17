@@ -133,7 +133,9 @@ export const getAllEvents = async (req, res, next) => {
     const totalRecords = await prisma.event.count(); // Get total events count
 
     if (events.length === 0) {
-      return res.status(404).json({ message: 'No events found.' });
+      return res
+        .status(200)
+        .json({ message: 'There are no events at the moment.' });
     }
 
     res.status(200).json({
