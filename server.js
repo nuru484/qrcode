@@ -49,7 +49,7 @@ const corsOptions = {
   },
   credentials: true, // Allow cookies to be sent with requests
   methods: 'GET, POST, PUT, DELETE', // Allow these HTTP methods
-  allowedHeaders: 'Content-Type, Authorization', // Allow these headers
+  allowedHeaders: 'Content-Type, Authorization, x-session-id', // Allow these headers
 };
 
 app.enable('trust proxy');

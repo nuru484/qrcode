@@ -4,8 +4,6 @@ import { CustomError } from '../utils/middleware/errorHandler.js';
 
 export const user = async (req, res, next) => {
   try {
-    console.log(req.session.userId);
-    console.log(req.session);
     const userId = req.session.userId;
 
     if (!userId) {
