@@ -1,7 +1,11 @@
 const sessionFromHeader = (req, res, next) => {
-  const sessionIdFromHeader = req.headers['x-session-id']; // Custom header
+  const sessionIdFromHeader = req.headers['x-session-id'];
+  console.log('Session from header: ' + sessionIdFromHeader);
+
+  console.log('Session Id before: ' + req.sessionID);
+
   if (sessionIdFromHeader) {
-    req.sessionID = sessionIdFromHeader; // Set the session ID for Passport
+    req.sessionID = sessionIdFromHeader;
   }
   next();
 };
