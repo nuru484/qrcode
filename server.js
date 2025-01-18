@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'; // To parse cookies in the request
 import cors from 'cors'; // To enable Cross-Origin Resource Sharing (CORS)
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
+import sessionFromHeader from './src/utils/middleware/sessionFromHeader.js';
 
 import routes from './src/routes/index.js';
 import initializePassport from './src/config/authentication.js';
@@ -56,6 +57,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(sessionFromHeader);
 app.use(passport.initialize());
 app.use(passport.session());
 initializePassport(passport);
