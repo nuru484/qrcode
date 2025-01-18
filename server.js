@@ -21,7 +21,6 @@ app.use(
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       httpOnly: true,
-      domain: '/',
     },
     secret: process.env.SESSION_SECRET,
     resave: false,
