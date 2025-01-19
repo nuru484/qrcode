@@ -4,7 +4,13 @@ import ENV from '../config/env.js';
 import { verifyToken } from './jwtAuthentication.js';
 
 const refreshToken = async (req, res) => {
-  const { refreshToken } = req.body;
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Authorization header missing' });
+  }
+
+  const refreshToken = authHeader.split(' ')[1];
 
   if (!refreshToken) {
     return res.status(401).json({ message: 'No refresh token provided!' });
@@ -17,7 +23,10 @@ const refreshToken = async (req, res) => {
       return res.status(403).json({ message: 'Invalid refresh token' });
     }
 
-    const decodedUser = await verifyToken(token, ENV.ACCESS_TOKEN_SECRET);
+    const decodedUser = await verifyToken(
+      refreshToken,
+      ENV.REFRESH_TOKEN_SECRET
+    );
 
     // Rotate refresh token
     const newRefreshToken = jwt.sign(
@@ -48,9 +57,10 @@ const refreshToken = async (req, res) => {
         .status(401)
         .json({ message: 'Refresh token expired. Please log in again.' });
     }
-    res
-      .status(500)
-      .json({ message: 'Server error during refresh token process', error });
+    res.status(500).json({
+      message: 'Server error during refresh token process',
+      error,
+    });
   }
 };
 
