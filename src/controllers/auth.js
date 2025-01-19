@@ -1,13 +1,15 @@
-import passport from 'passport';
 import prisma from '../config/prismaClient.js';
+import { compare } from 'bcrypt';
 import { CustomError } from '../utils/middleware/errorHandler.js';
+import ENV from '../config/env.js';
+import jwt from 'jsonwebtoken';
 
 export const user = async (req, res, next) => {
   try {
-    const userId = req.session.userId;
+    const userId = req.user.id;
 
     if (!userId) {
-      throw new CustomError(401, 'Session expired, please login again.');
+      throw new CustomError(401, 'Not authenticated, please login.');
     }
 
     const user = await prisma.user.findUnique({
@@ -27,50 +29,51 @@ export const user = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
+  const { username, password } = req.body;
   try {
-    passport.authenticate('local', (err, user, info) => {
-      if (err) {
-        return next(err); // Pass error to the error handler
-      }
-      if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
+    const user = await prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
 
-      req.logIn(user, (err) => {
-        if (err) {
-          return next(err);
-        }
-        // Save user ID in the session
-        req.session.userId = user.id;
+    if (!user) {
+      throw new CustomError(404, 'User not found');
+    }
 
-        return res
-          .status(200)
-          .json({ message: 'Login successful.', sessionId: req.sessionID });
-      });
-    })(req, res, next);
+    if (!password || (user && !user.password)) {
+      throw new Error('Password or hash missing');
+    }
+
+    const isPasswordValid = await compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new CustomError(401, 'Invalid credentials');
+    }
+
+    const accessToken = jwt.sign(
+      { id: user.id, role: user.role },
+      ENV.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: '15m',
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      ENV.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: '7d',
+      }
+    );
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken },
+    });
+
+    res.json({ message: 'Login successful', accessToken, refreshToken });
   } catch (error) {
     next(error);
-  }
-};
-
-export const logout = async (req, res, next) => {
-  try {
-    req.logout((err) => {
-      if (err) {
-        return next(err); // Pass error to error handler
-      }
-
-      // Destroy session
-      req.session.destroy((err) => {
-        if (err) {
-          return next(err); // Pass error to error handler
-        }
-
-        // Send successful logout response
-        return res.status(200).json({ message: 'Logout successful.' });
-      });
-    });
-  } catch (error) {
-    next(error); // Any unexpected errors
   }
 };

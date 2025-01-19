@@ -10,8 +10,8 @@ import {
   deleteAttendance,
 } from '../controllers/index.js';
 import { validateUserId, validateEventId } from '../validation/idValidators.js';
-import isAuthenticated from '../utils/middleware/authentication.js';
 import authorizeRole from '../utils/middleware/authorizeRole.js';
+import authenticateJWT from '../authentication/jwtAuthentication.js';
 
 router.post('/', createAttendance);
 
@@ -19,22 +19,22 @@ router.put(
   '/',
   validateUserId,
   validateEventId,
-  isAuthenticated,
+  authenticateJWT,
   updateAttendance
 );
 
-router.get('/', isAuthenticated, authorizeRole(['ADMIN']), getAllAttendance);
+router.get('/', authenticateJWT, authorizeRole(['ADMIN']), getAllAttendance);
 
 router.get(
   '/user/:userId',
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getUserAttendance
 );
 
 router.get(
   '/event/:eventId',
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getEventAttendance
 );
@@ -43,7 +43,7 @@ router.delete(
   '/',
   validateUserId,
   validateEventId,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN']),
   deleteAttendance
 );

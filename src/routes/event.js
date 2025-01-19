@@ -5,7 +5,6 @@ import {
   validateEventDetails,
   validateEventUpdateDetails,
 } from '../validation/event.js';
-
 import {
   createEvent,
   updateEvent,
@@ -13,14 +12,13 @@ import {
   getEventById,
   getAllEvents,
 } from '../controllers/index.js';
-
-import isAuthenticated from '../utils/middleware/authentication.js';
 import authorizeRole from '../utils/middleware/authorizeRole.js';
+import authenticateJWT from '../authentication/jwtAuthentication.js';
 
 router.post(
   '/',
   validateEventDetails,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN']),
   createEvent
 );
@@ -28,28 +26,28 @@ router.post(
 router.put(
   '/:eventId',
   validateEventUpdateDetails,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN']),
   updateEvent
 );
 
 router.delete(
   '/:eventId',
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN']),
   deleteEvent
 );
 
 router.get(
   '/:eventId',
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getEventById
 );
 
 router.get(
   '/',
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getAllEvents
 );

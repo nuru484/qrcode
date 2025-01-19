@@ -9,17 +9,15 @@ import {
   getRegistrationsByUser,
   checkRegistrationStatus,
 } from '../controllers/index.js';
-
 import { validateUserId, validateEventId } from '../validation/idValidators.js';
-
-import isAuthenticated from '../utils/middleware/authentication.js';
 import authorizeRole from '../utils/middleware/authorizeRole.js';
+import authenticateJWT from '../authentication/jwtAuthentication.js';
 
 router.post(
   '/',
   validateUserId,
   validateEventId,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   registerForEvent
 );
@@ -28,24 +26,24 @@ router.delete(
   '/',
   validateUserId,
   validateEventId,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   deleteEventRegistration
 );
 
-router.get('/', isAuthenticated, authorizeRole(['ADMIN']), getAllRegistrations);
+router.get('/', authenticateJWT, authorizeRole(['ADMIN']), getAllRegistrations);
 
 router.get(
   '/event/:eventId',
   validateEventId,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getRegistrationsByEvent
 );
 
 router.get(
   '/user/:userId',
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getRegistrationsByUser
 );
@@ -54,7 +52,7 @@ router.get(
   '/status',
   validateUserId,
   validateEventId,
-  isAuthenticated,
+  authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   checkRegistrationStatus
 );
