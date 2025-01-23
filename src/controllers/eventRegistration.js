@@ -168,8 +168,6 @@ export const getRegistrationsByUser = async (req, res, next) => {
       ...event,
     }));
 
-    console.log(flattenedRegistrations);
-
     const totalRecords = await prisma.registration.count({
       where: { userId: parseInt(userId) },
     });

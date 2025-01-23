@@ -129,6 +129,13 @@ export const getUserAttendance = async (req, res, next) => {
       },
     });
 
+    const flattenedUserAttendance = userAttendances.map(
+      ({ event, ...rest }) => ({
+        ...rest,
+        ...event,
+      })
+    );
+
     const totalRecords = await prisma.attendance.count({
       where: { userId: parseInt(userId) },
     });
@@ -141,7 +148,7 @@ export const getUserAttendance = async (req, res, next) => {
 
     res.status(200).json({
       message: 'User attendance records successfully fetched.',
-      data: userAttendances,
+      data: flattenedUserAttendance,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
