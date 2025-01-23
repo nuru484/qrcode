@@ -163,6 +163,13 @@ export const getRegistrationsByUser = async (req, res, next) => {
       },
     });
 
+    const flattenedRegistrations = registrations.map(({ event, ...rest }) => ({
+      ...rest,
+      ...event,
+    }));
+
+    console.log(flattenedRegistrations);
+
     const totalRecords = await prisma.registration.count({
       where: { userId: parseInt(userId) },
     });
@@ -175,7 +182,7 @@ export const getRegistrationsByUser = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Registrations fetched successfully.',
-      data: registrations,
+      data: flattenedRegistrations,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
