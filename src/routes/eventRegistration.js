@@ -35,7 +35,6 @@ router.get('/', authenticateJWT, authorizeRole(['ADMIN']), getAllRegistrations);
 
 router.get(
   '/event/:eventId',
-  validateEventId,
   authenticateJWT,
   authorizeRole(['ADMIN', 'STUDENT']),
   getRegistrationsByEvent

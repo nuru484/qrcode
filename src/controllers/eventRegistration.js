@@ -124,19 +124,33 @@ export const getRegistrationsByEvent = async (req, res, next) => {
       },
     });
 
+    const processedData = registrations.reduce((acc, item) => {
+      const { registrationCode, user } = item;
+      const { password, refreshToken, ...userWithoutSensitiveFields } = user;
+
+      acc.push({
+        id: item.id,
+        eventId: item.eventId,
+        createdAt: item.createdAt,
+        user: userWithoutSensitiveFields,
+      });
+
+      return acc;
+    }, []);
+
     const totalRecords = await prisma.registration.count({
       where: { eventId: parseInt(eventId) },
     });
 
     if (registrations.length === 0) {
       return res
-        .status(404)
+        .status(200)
         .json({ message: 'No registrations found for this event.' });
     }
 
     res.status(200).json({
       message: 'Registrations fetched successfully.',
-      data: registrations,
+      data: processedData,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

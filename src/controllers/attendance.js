@@ -188,6 +188,18 @@ export const getEventAttendance = async (req, res, next) => {
       },
     });
 
+    const processedData = eventAttendances.reduce((acc, item) => {
+      const { userId, user, ...rest } = item;
+      const { password, refreshToken, ...userWithoutSensitiveFields } = user;
+
+      acc.push({
+        ...rest,
+        user: userWithoutSensitiveFields,
+      });
+
+      return acc;
+    }, []);
+
     const totalRecords = await prisma.attendance.count({
       where: { eventId: parseInt(eventId) },
     });
@@ -200,7 +212,7 @@ export const getEventAttendance = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Event attendance records successfully fetched.',
-      data: eventAttendances,
+      data: processedData,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

@@ -40,7 +40,6 @@ model User {
   email        String  @unique
   role         role
   refreshToken String? @unique
-  new          String? @unique
 
   Attendance   Attendance[]
   Registration Registration[]
