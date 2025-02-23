@@ -71,6 +71,8 @@ export const updateAttendance = async (req, res, next) => {
   }
 };
 
+// uppdate
+
 // Get all attendance records (Admin Function) with Pagination
 export const getAllAttendance = async (req, res, next) => {
   try {
