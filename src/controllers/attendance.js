@@ -9,6 +9,8 @@ export const createAttendance = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid QR code data.' });
     }
 
+    // update
+
     // Find the registration record based on userId, eventId, and registrationId
     const registration = await prisma.registration.findUnique({
       where: { id: registrationId },
