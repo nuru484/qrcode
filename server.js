@@ -10,6 +10,8 @@ import errorHandler, {
 
 const app = express();
 
+// update
+
 const allowedOrigins = new Set(
   process.env.CORS_ACCESS ? process.env.CORS_ACCESS.split(',') : []
 );
