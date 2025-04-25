@@ -1,7 +1,7 @@
 import express from 'express';
 import ENV from './src/config/env.js';
-import cookieParser from 'cookie-parser'; // To parse cookies in the request
-import cors from 'cors'; // To enable Cross-Origin Resource Sharing (CORS)
+import cookieParser from 'cookie-parser'; 
+import cors from 'cors';
 import morgan from 'morgan';
 import routes from './src/routes/index.js';
 import errorHandler, {
