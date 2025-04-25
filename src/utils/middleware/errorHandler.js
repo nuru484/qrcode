@@ -1,5 +1,5 @@
 export class CustomError extends Error {
-  constructor(status, message, layer = 'unknown') {
+  constructor(message, status, layer = 'unknown') {
     super(message);
     this.status = status;
     this.layer = layer; // Track which layer the error occurred in
